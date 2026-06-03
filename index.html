@@ -73,7 +73,7 @@
 
 <header>
   <h1>Emoji <em>Mosaic</em></h1>
-  <p class="tag">基于色彩匹配的图像生成引擎。每个单元格通过测量设备上真实的表情颜色，在 Lab 色彩空间中寻找最接近的 Emoji 进行替换。</p>
+  <p class="tag">基于色彩匹配与梯度光照的图像引擎。月相模式下，系统会计算图像局部明暗梯度，并自动旋转字符朝向来复原立体光照效果。</p>
 </header>
 
 <div class="wrap">
@@ -88,11 +88,16 @@
     <div class="field">
       <span class="lbl">渲染模式</span>
       <div class="seg" id="mode">
-        <!-- 调换顺序：月相浮雕在前并默认选中 -->
         <button data-m="moon" class="on">月相浮雕</button>
         <button data-m="color">色彩匹配</button>
       </div>
     </div>
+
+    <!-- 新增：光照角度调节器（仅在月相模式显示） -->
+    <label class="field" id="lightwrap">
+      <span class="lbl">光照投影角度 <b id="lightv">0</b>°</span>
+      <input type="range" id="light" min="0" max="360" value="0">
+    </label>
 
     <label class="field">
       <span class="lbl">分辨率 <b id="colsv">56</b> 列</span>
@@ -126,7 +131,10 @@
       <button id="txtin">↑ 导入文本</button>
     </div>
     <input type="file" id="txtfile" accept=".txt,text/plain" class="hidden">
-    <p class="swap">提示：上方色块显示的是 Emoji 在您当前设备上的实际测量色值，这确保了引擎的匹配在跨设备（苹果/系统自带字体）下依然保持高度精准。</p>
+    <p class="swap">
+      提示：上方色块为您设备真实测量的 Emoji 颜色。<br><br>
+      <b>注：旋转画布实现的月相任意光照角度，在导出为纯文本（.txt 或复制）时无法保留旋转属性，强烈推荐导出 JPEG 或高精度 SVG 矢量图保存。</b>
+    </p>
   </aside>
 
   <main>
@@ -134,7 +142,7 @@
     <div class="meta">
       <span>网格 <b id="mgrid">—</b></span>
       <span>单元格 <b id="mcells">—</b></span>
-      <span>当前选用 <b id="mpal">—</b> 个表情</span>
+      <span>选用 <b id="mpal">—</b> 个表情</span>
       <span>耗时 <b id="mtime">—</b> 毫秒</span>
     </div>
   </main>
@@ -237,6 +245,7 @@ function renderSwatches(){
   $('mpal').textContent=palette.length;
 }
 
+// 修改后的光照决策核心：依然是大于0则朝向受光面，但它已被投影映射
 function moonGlyph(b, grad){
   if(b < 0.08) return '🌑';
   if(b > 0.92) return '🌕';
@@ -271,20 +280,46 @@ function run(){
   for(let p=0,j=0;p<px.length;p+=4,j++)
     lum[j]=(0.2126*px[p]+0.7152*px[p+1]+0.0722*px[p+2])/255;
 
+  // 引入全局光照角度计算
+  const theta = +$('light').value;
+  const rad = theta * Math.PI / 180;
+  const lightX = Math.cos(rad);
+  const lightY = Math.sin(rad);
+
   const text=[];
   for(let y=0;y<rows;y++){
     let line='';
     for(let x=0;x<cols;x++){
       const i=(y*cols+x)*4; let ch;
+      const cx = x*cell + cell/2;
+      const cy = y*cell + cell/2 + 1; // 字体微调偏置
+
       if(mode==='moon'){
         const xl=Math.max(0,x-1), xr=Math.min(cols-1,x+1);
-        const grad=lum[y*cols+xr]-lum[y*cols+xl];
-        ch=moonGlyph(lum[y*cols+x], grad);
+        const yu=Math.max(0,y-1), yd=Math.min(rows-1,y+1);
+        
+        // 分别计算图像的水平和垂直梯度
+        const gradX=lum[y*cols+xr]-lum[y*cols+xl];
+        const gradY=lum[yd*cols+x]-lum[yu*cols+x];
+        
+        // 把当前像素的法线梯度映射(点积)到设置的光源方向上
+        const grad = gradX * lightX + gradY * lightY;
+        ch = moonGlyph(lum[y*cols+x], grad);
+        
+        // 渲染时进行独立画布旋转
+        if (theta !== 0) {
+            octx.save();
+            octx.translate(cx, cy);
+            octx.rotate(rad);
+            octx.fillText(ch, 0, 0);
+            octx.restore();
+        } else {
+            octx.fillText(ch, cx, cy);
+        }
       } else {
-        // 还原：保持计算最纯粹，不再使用命中率无效的缓存
         ch=nearest(rgbToLab(px[i],px[i+1],px[i+2])).ch;
+        octx.fillText(ch, cx, cy);
       }
-      octx.fillText(ch, x*cell+cell/2, y*cell+cell/2+1);
       line+=ch;
     }
     text.push(line);
@@ -314,7 +349,11 @@ let runTimer=null, importedText=null;
 function runDebounced(ms){ clearTimeout(runTimer); runTimer=setTimeout(run, ms==null?25:ms); }
 
 $('cols').addEventListener('input',e=>{$('colsv').textContent=e.target.value; runDebounced(25);});
+// 监听新增的光照角度控件
+$('light').addEventListener('input',e=>{$('lightv').textContent=e.target.value; runDebounced(20);});
+
 $('bg').addEventListener('input',()=>{ if(img) runDebounced(25); else if(importedText) renderTextGrid(importedText); });
+
 document.querySelectorAll('#palette button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('#palette button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on');paletteName=b.dataset.p;palette=buildPalette(paletteName);
@@ -325,6 +364,7 @@ function toggleModeUI(){
   const moon = mode === 'moon';
   $('palwrap').style.opacity = moon ? 0.35 : 1;
   $('palwrap').style.pointerEvents = moon ? 'none' : 'auto';
+  $('lightwrap').style.display = moon ? 'block' : 'none'; // 仅在月相模式下显示光照滑块
   if(moon && $('bg').value.toLowerCase() !== '#000000'){ $('bg').value='#070707'; }
 }
 
@@ -364,10 +404,21 @@ $('dl_svg').addEventListener('click',()=>{
   const fontSize = Math.floor(cell * 0.96);
   svg += `<style>text { font-family: ${EMOJI_FONT}; font-size: ${fontSize}px; dominant-baseline: middle; text-anchor: middle; }</style>`;
   
+  const currentMode = mode;
+  const currentTheta = +$('light').value;
+
   for(let y=0; y<rows; y++){
     const chars = colsArr[y];
     for(let x=0; x<chars.length; x++){
-      svg += `<text x="${x*cell+cell/2}" y="${y*cell+cell/2}">${chars[x]}</text>`;
+      const cx = x*cell + cell/2;
+      const cy = y*cell + cell/2 + 1;
+      
+      // 如果处于旋转状态，则为单个 text 标签添加 transform 变换矩阵属性
+      if (currentMode === 'moon' && currentTheta !== 0) {
+        svg += `<text x="${cx}" y="${cy}" transform="rotate(${currentTheta}, ${cx}, ${cy})">${chars[x]}</text>`;
+      } else {
+        svg += `<text x="${cx}" y="${cy}">${chars[x]}</text>`;
+      }
     }
   }
   svg += `</svg>`;
@@ -388,6 +439,8 @@ function splitGraphemes(s){
   }
   return Array.from(s);
 }
+
+// --- 修正文字导入渲染(无旋转属性) ---
 function renderTextGrid(text){
   const lines=text.replace(/\r/g,'').replace(/\s+$/,'').split('\n');
   const rowsArr=lines.map(splitGraphemes);
@@ -408,6 +461,7 @@ function renderTextGrid(text){
   $('mcells').textContent=(cols*rows).toLocaleString();
   $('mtime').textContent=0;
 }
+
 $('txtdl').addEventListener('click',()=>{
   if(!lastGrid) return;
   const a=document.createElement('a');a.download='emoji-mosaic.txt';
