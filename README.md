@@ -1,72 +1,115 @@
-# Emoji Mosaic
+# Emoji Mosaic · 彩色匹配图片引擎
 
-A single-file, in-browser tool that turns any image into emoji art by **color matching** — every cell becomes the emoji whose measured average color sits closest to that patch of the image, in perceptual Lab space. It also includes a **moon-phase relief** mode that sculpts images out of 🌑🌒🌓🌔🌕🌖🌗🌘.
+[English](#english) | [中文](#中文)
 
-No build step, no dependencies, no server. Open `emoji-mosaic.html` in a browser and go.
+---
 
-## Quick start
+## English
 
-1. Open `emoji-mosaic.html` in any modern browser (Chrome, Safari, Firefox, Edge).
-2. Drag an image onto the drop zone, or click to choose a file.
-3. Adjust the controls. The output re-renders live.
-4. Export with **↓ PNG**, or **⧉ Copy text** to grab the raw emoji grid as plain text.
+### Overview
 
-A small sample image renders on load, so you can see the engine working before uploading anything.
+**Emoji Mosaic** is a browser-based tool that transforms any image into a mosaic composed of emoji characters. Each cell in the output grid is the emoji whose **measured average color** (perceptually in Lab color space) best matches the corresponding region of the source image.
 
-## How it works
+Unlike traditional emoji art tools that rely on hard-coded color mappings, this engine **measures each emoji’s actual rendered color on your device** (macOS, Windows, Linux, mobile, etc.) and builds a dynamic palette. The result is always accurate, whether your system uses Apple Color Emoji, Noto Color Emoji, or Twemoji.
 
-The core idea is that the emoji palette is **measured, not hard-coded**:
+### Features
 
-1. On load, each candidate emoji is drawn to an offscreen canvas using your system's emoji font.
-2. Its **alpha-weighted average color** is computed over opaque pixels only (so transparent corners don't drag the color toward the background), then converted to **CIELAB**.
-3. The uploaded image is downscaled to a `cols × rows` grid so each cell becomes one area-averaged color.
-4. Each cell is matched to the nearest palette entry by **Lab distance**, and the emoji is painted into an output canvas.
+- **Drag & drop** or click to upload any image (JPEG, PNG, WebP, etc.)
+- **Adjustable resolution** – control the number of columns (16–512)
+- **Multiple emoji palettes**:
+  - Squares, rounds, hearts, extended spectrum, and a "max" palette with dozens of emoji
+  - Each palette is **measured live** – you see the actual swatch colors
+- **Two rendering modes**:
+  - *Color match* – nearest emoji based on perceptual color distance (Lab ΔE)
+  - *Moon relief* – maps brightness to moon phase emoji (🌑→🌕) with directional lighting
+- **Custom background color** – choose any hex color for the canvas behind emoji cells
+- **Export** – download as PNG or copy the mosaic as plain text (emoji grid)
+- **Performance stats** – grid size, cell count, palette size, and render time
 
-Because colors are measured on your device, the matching stays correct whether your system renders emoji via Apple Color Emoji, Noto, Twemoji, or Segoe. The sidebar swatches show the actual measured color of each emoji — that's the palette the matcher uses.
+### How It Works
 
-If on-device measurement fails for any glyph (some browsers can't read color-emoji bitmaps back from canvas), the tool falls back to a built-in approximate color so the palette is never empty.
+1. For the selected palette, each emoji is rendered onto a small hidden canvas and its average RGB color is measured.
+2. Colors are converted to **Lab color space** (perceptually uniform), which gives better matching than RGB.
+3. The uploaded image is downsampled to the target grid size (`cols` × `rows`).
+4. For each cell, the source color’s Lab value is compared against all measured emoji colors – the closest match wins.
+5. The emoji are drawn onto an output canvas, respecting the chosen background color.
 
-## Controls
+The “moon relief” mode ignores the color palette and instead converts brightness (luminance) into moon phase symbols, with horizontal gradient detection to decide waxing vs. waning phases.
 
-| Control | What it does |
-|---|---|
-| **Mode** | `Color match` (nearest-color mosaic) or `Moon relief` (luminance + light-direction emboss). |
-| **Resolution** | Number of columns, 16–512. Rows are derived from the image aspect ratio. |
-| **Palette** | Emoji set used for color matching (see below). Disabled in Moon relief mode. |
-| **Backing color** | Fill behind the glyphs. Matters most with non-square emoji, whose transparent corners let it show through. |
-| **↓ PNG** | Download the rendered mosaic as a PNG. |
-| **⧉ Copy text** | Copy the emoji grid as plain text (newline-separated rows). |
+### Technical Notes
 
-### Palettes
+- **No external dependencies** – vanilla HTML/CSS/JavaScript.
+- **Emoji measurement** happens entirely on your device (privacy-friendly, no uploads to any server).
+- Fallback colors are provided for emoji that fail to render (rare, but ensures palette never breaks).
+- The output canvas size is adaptive: `cell size = clamp(7, 24, 2600/cols)`, so large grids remain viewable without overflowing.
 
-- **Squares** — `🟥🟧🟨🟩🟦🟪🟫⬛⬜`. Fully fill each cell, giving the cleanest solid mosaic. Only ~9 colors, so output is intentionally posterized.
-- **Round** — circle equivalents; similar gamut, leaves background visible in the corners.
-- **Spectrum+** — squares plus assorted colored objects for a wider range.
-- **Max** — ~60 emoji spanning the broadest gamut, including the mid-grays and off-whites the small sets miss. A dedupe pass merges any emoji that measure to near-identical colors, keeping the palette efficient.
-- **Hearts** — `❤️🧡💛💚💙💜🤎🖤🤍🩷🩵` for a themed look.
+### Usage
 
-### Moon relief mode
+1. Open `index.html` in any modern browser (Chrome, Firefox, Safari, Edge).
+2. Drag an image onto the drop zone or click to select a file.
+3. Adjust **Resolution** to change the grid density.
+4. Switch **Color match** or **Moon relief** modes.
+5. Experiment with different **Palettes** – the swatch row shows live measured colors.
+6. Click **↓ PNG** to download the result, or **⧉ Copy text** to copy the raw emoji grid.
+7. Change **Backing color** to suit your preference (visible in gaps or transparent emoji).
 
-Ignores color entirely and builds the image from the eight moon phases:
+### Why On-Device Measurement?
 
-- **Brightness** picks the phase along the dark→light axis (🌑 → 🌕).
-- The **horizontal light gradient** within the image decides waxing vs waning: cells that are brighter toward the right use right-lit phases (🌒🌓🌔), brighter toward the left use left-lit phases (🌘🌗🌖).
+Emoji fonts vary widely across platforms. Apple’s red square (🟥) is not the same shade as Google’s or Microsoft’s. By measuring the actual rendered color on *your* browser, the mosaic stays true to what you see – no assumptions, no hard-coded RGB values.
 
-Encoding light direction this way gives edges a lit-from-the-side, sculpted feel rather than flat shading. Works best on images with strong directional lighting (portraits, side-lit scenes) on a dark backing.
+---
 
-## Notes & limitations
+## 中文
 
-- **Emoji gamut is narrow.** Even the Max palette can't reach deeply desaturated or muted tones — emoji cluster around saturated primaries, mid-grays, and a few browns. Photos with subtle palettes will flatten.
-- **High resolution = large exports.** Cell size shrinks adaptively as columns increase to keep PNG dimensions reasonable, but 512 columns on a tall image is still a multi-thousand-pixel file. Watch the build-time readout.
-- **Text copy** preserves emoji including variation selectors; alignment in other apps depends on their emoji width handling.
-- Everything runs client-side. Images never leave your machine.
+### 概述
 
-## Possible next steps
+**Emoji Mosaic** 是一款在浏览器中运行的图像转换工具，能将任意图片变成由 Emoji 字符组成的马赛克图案。输出网格中的每一个单元格，都是与图像对应区域在 **感知均匀的 Lab 色彩空间** 中平均颜色最接近的那个 Emoji。
 
-- **Dithering** (e.g. Floyd–Steinberg) to make the limited palette mix optically and fake in-between colors — the single biggest quality gain available for color mode.
-- **Light-direction control** for relief mode, to rotate the "sun" to any angle (including vertical gradients) instead of just left/right.
-- **Per-emoji repeat penalty** so flat regions don't collapse to a single repeated glyph.
+与传统 Emoji 艺术工具不同，本引擎会 **实时测量每个 Emoji 在你当前设备上实际渲染出来的颜色**（无论 macOS、Windows、Linux 还是手机），并建立动态调色板。因此，无论你的系统使用 Apple Color Emoji、Noto Color Emoji 还是 Twemoji，匹配结果始终准确。
 
-## File
+### 功能特性
 
-- `emoji-mosaic.html` — the entire application (HTML + CSS + JS in one file).
+- **拖拽或点击**上传图像（支持 JPEG、PNG、WebP 等）
+- **可调分辨率** – 控制列数（16～512 列）
+- **多种 Emoji 调色板**：
+  - 方块、圆形、爱心、扩展色板、“Max” 大调色板（包含数十个 Emoji）
+  - 每个调色板 **实时测量** – 你看到的色块就是设备上的真实颜色
+- **两种渲染模式**：
+  - *颜色匹配* – 基于 Lab 色差选取最接近的 Emoji
+  - *月相浮雕* – 将亮度映射为月相符号（🌑→🌕），并检测水平渐变方向决定盈/亏
+- **自定义背景色** – 可任意选择十六进制颜色作为 Emoji 背后的底色
+- **导出** – 下载为 PNG 图片，或复制纯文本格式的 Emoji 网格
+- **性能统计** – 显示网格尺寸、单元格数量、调色板大小和渲染耗时
+
+### 工作原理
+
+1. 根据所选调色板，将每个 Emoji 渲染到一个隐藏的小画布上，测量其平均 RGB 颜色。
+2. 将颜色转换到 **Lab 色彩空间**（感知均匀），匹配效果优于 RGB。
+3. 将上传的图片缩放到目标网格尺寸（列数 × 行数）。
+4. 对于每个单元格，将源颜色的 Lab 值与所有已测量的 Emoji 颜色进行比较 – 选择最接近的那个。
+5. 在输出画布上绘制 Emoji，并应用所选背景色。
+
+“月相浮雕”模式不使用颜色调色板，而是将亮度（明度）转换为月相符号，并通过水平方向的亮度梯度判断盈月或亏月。
+
+### 技术说明
+
+- **无外部依赖** – 纯原生 HTML/CSS/JavaScript。
+- **Emoji 测量** 完全在本地进行（保护隐私，不上传任何图像到服务器）。
+- 为极少数无法渲染的 Emoji 提供了备用颜色（避免调色板断裂）。
+- 输出画布尺寸自适应：`单元格大小 = clamp(7, 24, 2600/列数)`，保证大网格仍能在页面上正常显示。
+
+### 使用方法
+
+1. 用任意现代浏览器（Chrome、Firefox、Safari、Edge）打开 `index.html`。
+2. 将图片拖放到上传区，或点击选择文件。
+3. 调整 **分辨率** 滑块改变马赛克密度。
+4. 切换 **颜色匹配** 或 **月相浮雕** 模式。
+5. 尝试不同的 **调色板** – 顶部的色块显示实时测量颜色。
+6. 点击 **↓ PNG** 下载结果，或点击 **⧉ 复制文本** 复制纯文本 Emoji 网格。
+7. 调整 **背景色** 适应个人喜好（在间隙或半透明 Emoji 处可见）。
+
+### 为什么要实时测量 Emoji？
+
+不同平台上的 Emoji 字体差异很大。苹果的红色方块（🟥）与谷歌或微软的红色方块并非同一色度。通过测量当前浏览器中实际渲染的颜色，马赛克能够保持所见即所得 – 不依赖任何固定 RGB 数值。
+
+---
