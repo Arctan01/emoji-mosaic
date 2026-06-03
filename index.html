@@ -119,6 +119,11 @@
       <button id="dl">↓ PNG</button>
       <button id="cp">⧉ Copy text</button>
     </div>
+    <div class="acts" style="margin-top:8px">
+      <button id="txtdl">↓ Text .txt</button>
+      <button id="txtin">↑ Import text</button>
+    </div>
+    <input type="file" id="txtfile" accept=".txt,text/plain" class="hidden">
     <p class="swap">Tip: the swatches above show what each emoji <i>actually</i> measures as on <i>your</i> device — the match is recomputed from those, never hard-coded, so it stays right across Apple / Noto / Twemoji fonts.</p>
   </aside>
 
@@ -297,7 +302,7 @@ function run(){
 // ---- wiring ----------------------------------------------------------------
 function setImage(src){
   const i=new Image();
-  i.onload=()=>{ img=i; (i.decode?i.decode().catch(()=>{}):Promise.resolve()).then(run); };
+  i.onload=()=>{ img=i; importedText=null; (i.decode?i.decode().catch(()=>{}):Promise.resolve()).then(run); };
   i.onerror=()=>{};
   i.src=src;
 }
@@ -309,8 +314,11 @@ $('drop').addEventListener('click',()=>$('file').click());
 ['dragleave','drop'].forEach(ev=>$('drop').addEventListener(ev,e=>{e.preventDefault();$('drop').classList.remove('hot');}));
 $('drop').addEventListener('drop',e=>loadFile(e.dataTransfer.files[0]));
 
-$('cols').addEventListener('input',e=>{$('colsv').textContent=e.target.value;run();});
-$('bg').addEventListener('input',run);
+let runTimer=null, importedText=null;
+function runDebounced(ms){ clearTimeout(runTimer); runTimer=setTimeout(run, ms==null?25:ms); }
+
+$('cols').addEventListener('input',e=>{$('colsv').textContent=e.target.value; runDebounced(25);});
+$('bg').addEventListener('input',()=>{ if(img) runDebounced(25); else if(importedText) renderTextGrid(importedText); });
 document.querySelectorAll('#palette button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('#palette button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on');paletteName=b.dataset.p;palette=buildPalette(paletteName);renderSwatches();run();
@@ -327,6 +335,46 @@ document.querySelectorAll('#mode button').forEach(b=>b.addEventListener('click',
 
 $('dl').addEventListener('click',()=>{const a=document.createElement('a');a.download='emoji-mosaic.png';a.href=out.toDataURL('image/png');a.click();});
 $('cp').addEventListener('click',()=>{if(lastGrid)navigator.clipboard.writeText(lastGrid).then(()=>{const b=$('cp');const o=b.textContent;b.textContent='✓ copied';setTimeout(()=>b.textContent=o,1200);});});
+
+// ---- text import / export --------------------------------------------------
+function splitGraphemes(s){
+  if(typeof Intl!=='undefined' && Intl.Segmenter){
+    return Array.from(new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(s), x=>x.segment);
+  }
+  return Array.from(s);                          // fallback (may split ZWJ sequences)
+}
+function renderTextGrid(text){
+  const lines=text.replace(/\r/g,'').replace(/\s+$/,'').split('\n');
+  const rowsArr=lines.map(splitGraphemes);
+  const rows=rowsArr.length;
+  const cols=Math.max(1,...rowsArr.map(r=>r.length));
+  if(!rows) return;
+  const cell=Math.max(7,Math.min(24,Math.round(2600/cols)));
+  out.width=cols*cell; out.height=rows*cell;
+  octx.fillStyle=$('bg').value; octx.fillRect(0,0,out.width,out.height);
+  octx.font=Math.floor(cell*0.96)+'px '+EMOJI_FONT;
+  octx.textAlign='center'; octx.textBaseline='middle';
+  for(let y=0;y<rows;y++){const r=rowsArr[y];
+    for(let x=0;x<r.length;x++) octx.fillText(r[x], x*cell+cell/2, y*cell+cell/2+1);
+  }
+  lastGrid=rowsArr.map(r=>r.join('')).join('\n');
+  importedText=text;
+  $('mgrid').textContent=cols+'×'+rows;
+  $('mcells').textContent=(cols*rows).toLocaleString();
+  $('mtime').textContent=0;
+}
+$('txtdl').addEventListener('click',()=>{
+  if(!lastGrid) return;
+  const a=document.createElement('a');a.download='emoji-mosaic.txt';
+  a.href=URL.createObjectURL(new Blob([lastGrid],{type:'text/plain;charset=utf-8'}));
+  a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+});
+$('txtin').addEventListener('click',()=>$('txtfile').click());
+$('txtfile').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=ev=>{ img=null; renderTextGrid(ev.target.result); }; r.readAsText(f);
+  e.target.value='';
+});
 
 // ---- boot: build palette + draw a sample so it's not empty -----------------
 function makeSample(){
