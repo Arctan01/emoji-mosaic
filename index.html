@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>EMOJI MOSAIC · color-matched picture engine</title>
+<title>Emoji Mosaic · 像素表情生成引擎</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@
       radial-gradient(80% 60% at 100% 110%, rgba(120,90,255,.08), transparent 55%),
       var(--bg);
     color:var(--ink);
-    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-family:"IBM Plex Mono", "PingFang SC", "Microsoft YaHei", ui-monospace, monospace;
     font-size:14px;
     line-height:1.5;
     -webkit-font-smoothing:antialiased;
@@ -38,34 +38,34 @@
   header{max-width:1100px;margin:0 auto 28px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:18px}
   h1{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(30px,5vw,52px);line-height:.95;margin:0;letter-spacing:-.01em}
   h1 em{font-style:italic;color:var(--amber)}
-  .tag{color:var(--dim);font-size:12px;max-width:42ch;text-transform:uppercase;letter-spacing:.12em}
+  .tag{color:var(--dim);font-size:12px;max-width:48ch;letter-spacing:0.02em}
   .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:300px 1fr;gap:28px;align-items:start}
   @media(max-width:820px){.wrap{grid-template-columns:1fr}}
-  .panel{border:1px solid var(--line-soft);border-radius:14px;background:rgba(20,16,12,.5);padding:20px;backdrop-filter:blur(6px)}
-  .panel h2{font-family:"Fraunces",serif;font-weight:500;font-style:italic;font-size:17px;margin:0 0 16px;color:var(--amber-soft);letter-spacing:0}
+  .panel{border:1px solid var(--line-soft);border-radius:14px;background:rgba(20,16,12,.6);padding:22px;backdrop-filter:blur(10px); box-shadow: 0 8px 32px rgba(0,0,0,0.2); transition: opacity 0.3s;}
+  .panel h2{font-family:"Fraunces",serif;font-weight:500;font-style:italic;font-size:18px;margin:0 0 16px;color:var(--amber-soft);letter-spacing:0}
   label.field{display:block;margin:0 0 18px}
-  .lbl{display:flex;justify-content:space-between;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--dim);margin-bottom:7px}
+  .lbl{display:flex;justify-content:space-between;font-size:12px;letter-spacing:.05em;color:var(--dim);margin-bottom:8px}
   .lbl b{color:var(--amber);font-weight:600}
-  input[type=range]{width:100%;accent-color:var(--amber);height:4px}
-  .drop{border:1.5px dashed var(--line);border-radius:12px;padding:26px 14px;text-align:center;cursor:pointer;transition:.18s;color:var(--dim);font-size:12px}
-  .drop:hover,.drop.hot{border-color:var(--amber);color:var(--amber-soft);background:rgba(255,154,60,.05)}
+  input[type=range]{width:100%;accent-color:var(--amber);height:4px;cursor:pointer;}
+  .drop{border:1.5px dashed var(--line);background:rgba(255,255,255,0.02);border-radius:12px;padding:26px 14px;text-align:center;cursor:pointer;transition:.2s cubic-bezier(0.4, 0, 0.2, 1);color:var(--dim);font-size:12px; margin-bottom: 20px;}
+  .drop:hover,.drop.hot{border-color:var(--amber);color:var(--amber-soft);background:rgba(255,154,60,.08); transform: translateY(-1px);}
   .seg{display:flex;flex-wrap:wrap;gap:6px}
-  .seg button{flex:1;min-width:fit-content;background:transparent;border:1px solid var(--line-soft);color:var(--dim);
-    font-family:inherit;font-size:11px;padding:7px 9px;border-radius:8px;cursor:pointer;transition:.15s;text-transform:uppercase;letter-spacing:.06em}
+  .seg button{flex:1;min-width:fit-content;background:rgba(0,0,0,0.2);border:1px solid var(--line-soft);color:var(--dim);
+    font-family:inherit;font-size:12px;padding:7px 9px;border-radius:8px;cursor:pointer;transition:.15s;letter-spacing:.02em}
   .seg button:hover{border-color:var(--line);color:var(--ink)}
   .seg button.on{background:var(--amber);border-color:var(--amber);color:#1a1206;font-weight:600}
-  .swatches{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
-  .sw{width:20px;height:20px;border-radius:5px;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1}
+  .swatches{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  .sw{width:22px;height:22px;border-radius:5px;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1}
   .acts{display:flex;gap:8px;margin-top:4px}
-  .acts button{flex:1;background:transparent;border:1px solid var(--line);color:var(--amber-soft);font-family:inherit;font-size:12px;padding:10px;border-radius:9px;cursor:pointer;transition:.15s}
+  .acts button{flex:1;background:rgba(255,154,60,.05);border:1px solid var(--line);color:var(--amber-soft);font-family:inherit;font-size:12px;padding:10px;border-radius:9px;cursor:pointer;transition:.15s}
   .acts button:hover{background:var(--amber);color:#1a1206;border-color:var(--amber)}
-  .stage{border:1px solid var(--line-soft);border-radius:14px;overflow:hidden;background:#000;min-height:360px;display:flex;align-items:center;justify-content:center;position:relative}
+  .stage{border:1px solid var(--line-soft);border-radius:14px;overflow:hidden;background:#000;min-height:360px;display:flex;align-items:center;justify-content:center;position:relative; box-shadow: 0 8px 32px rgba(0,0,0,0.3);}
   .stage canvas{max-width:100%;height:auto;display:block;image-rendering:auto}
-  .meta{display:flex;gap:18px;flex-wrap:wrap;color:var(--dim);font-size:11px;margin-top:12px;text-transform:uppercase;letter-spacing:.1em}
+  .meta{display:flex;gap:18px;flex-wrap:wrap;color:var(--dim);font-size:12px;margin-top:14px;letter-spacing:.05em}
   .meta b{color:var(--amber)}
-  .swap{font-size:10px;color:var(--dim);margin-top:10px;line-height:1.6}
+  .swap{font-size:11px;color:var(--dim);margin-top:16px;line-height:1.6; opacity: 0.8;}
   .hidden{display:none}
-  input[type=color]{width:100%;height:34px;border:1px solid var(--line-soft);border-radius:8px;background:transparent;cursor:pointer;padding:2px}
+  input[type=color]{width:100%;height:36px;border:1px solid var(--line-soft);border-radius:8px;background:transparent;cursor:pointer;padding:2px}
 </style>
 </head>
 <body>
@@ -73,67 +73,69 @@
 
 <header>
   <h1>Emoji <em>Mosaic</em></h1>
-  <p class="tag">A color-matched picture engine. Every cell is the emoji whose measured average color sits closest to the image, in perceptual Lab space.</p>
+  <p class="tag">基于色彩匹配的图像生成引擎。每个单元格通过测量设备上真实的表情颜色，在 Lab 色彩空间中寻找最接近的 Emoji 进行替换。</p>
 </header>
 
 <div class="wrap">
   <aside class="panel">
-    <h2>Controls</h2>
+    <h2>控制面板</h2>
 
     <div class="drop" id="drop">
-      <div>Drop an image here<br>or <span style="color:var(--amber);text-decoration:underline">choose a file</span></div>
+      <div>将图片拖拽至此<br>或 <span style="color:var(--amber);text-decoration:underline">选择文件</span></div>
       <input type="file" id="file" accept="image/*" class="hidden">
     </div>
 
     <div class="field">
-      <span class="lbl">Mode</span>
+      <span class="lbl">渲染模式</span>
       <div class="seg" id="mode">
-        <button data-m="color" class="on">Color match</button>
-        <button data-m="moon">Moon relief</button>
+        <!-- 调换顺序：月相浮雕在前并默认选中 -->
+        <button data-m="moon" class="on">月相浮雕</button>
+        <button data-m="color">色彩匹配</button>
       </div>
     </div>
 
     <label class="field">
-      <span class="lbl">Resolution <b id="colsv">56</b> cols</span>
+      <span class="lbl">分辨率 <b id="colsv">56</b> 列</span>
       <input type="range" id="cols" min="16" max="1024" value="56">
     </label>
 
     <div class="field" id="palwrap">
-      <span class="lbl">Palette</span>
+      <span class="lbl">调色板</span>
       <div class="seg" id="palette">
-        <button data-p="squares" class="on">Squares</button>
-        <button data-p="round">Round</button>
-        <button data-p="spectrum">Spectrum+</button>
-        <button data-p="max">Max</button>
-        <button data-p="hearts">Hearts</button>
+        <button data-p="squares" class="on">方块</button>
+        <button data-p="round">圆点</button>
+        <button data-p="spectrum">光谱+</button>
+        <button data-p="max">全量</button>
+        <button data-p="hearts">爱心</button>
       </div>
       <div class="swatches" id="swatches"></div>
     </div>
 
     <label class="field">
-      <span class="lbl">Backing color</span>
-      <input type="color" id="bg" value="#0c0a08">
+      <span class="lbl">背景颜色</span>
+      <input type="color" id="bg" value="#070707">
     </label>
 
     <div class="acts">
-      <button id="dl">↓ PNG</button>
-      <button id="cp">⧉ Copy text</button>
+      <button id="dl">↓ 导出 JPEG</button>
+      <button id="dl_svg">↓ 导出 SVG</button>
+      <button id="cp">⧉ 复制文本</button>
     </div>
     <div class="acts" style="margin-top:8px">
-      <button id="txtdl">↓ Text .txt</button>
-      <button id="txtin">↑ Import text</button>
+      <button id="txtdl">↓ 导出 .txt</button>
+      <button id="txtin">↑ 导入文本</button>
     </div>
     <input type="file" id="txtfile" accept=".txt,text/plain" class="hidden">
-    <p class="swap">Tip: the swatches above show what each emoji <i>actually</i> measures as on <i>your</i> device — the match is recomputed from those, never hard-coded, so it stays right across Apple / Noto / Twemoji fonts.</p>
+    <p class="swap">提示：上方色块显示的是 Emoji 在您当前设备上的实际测量色值，这确保了引擎的匹配在跨设备（苹果/系统自带字体）下依然保持高度精准。</p>
   </aside>
 
   <main>
     <div class="stage" id="stage"><canvas id="out"></canvas></div>
     <div class="meta">
-      <span>grid <b id="mgrid">—</b></span>
-      <span>cells <b id="mcells">—</b></span>
-      <span>palette <b id="mpal">—</b> emoji</span>
-      <span>build <b id="mtime">—</b> ms</span>
+      <span>网格 <b id="mgrid">—</b></span>
+      <span>单元格 <b id="mcells">—</b></span>
+      <span>当前选用 <b id="mpal">—</b> 个表情</span>
+      <span>耗时 <b id="mtime">—</b> 毫秒</span>
     </div>
   </main>
 </div>
@@ -151,7 +153,7 @@ const PALETTES = {
              '🌑','🪨','🕳️','☁️','🥚','🍚','🦢','🌰','🥯','🦴'],
   moon:     ['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘']
 };
-// Approximate colors used ONLY when on-device measurement fails (keeps palette non-empty)
+
 const FALLBACK = {
   '🟥':[221,46,68],'🟧':[244,144,12],'🟨':[253,203,46],'🟩':[120,177,89],'🟦':[85,172,238],
   '🟪':[170,116,219],'🟫':[153,107,71],'⬛':[49,55,61],'⬜':[230,233,235],
@@ -172,7 +174,6 @@ const FALLBACK = {
 
 const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
 
-// ---- color science ---------------------------------------------------------
 function srgbToLin(c){c/=255;return c<=0.04045?c/12.92:Math.pow((c+0.055)/1.055,2.4);}
 function rgbToLab(r,g,b){
   const R=srgbToLin(r),G=srgbToLin(g),B=srgbToLin(b);
@@ -185,7 +186,6 @@ function rgbToLab(r,g,b){
 }
 function dist2(a,b){const d0=a[0]-b[0],d1=a[1]-b[1],d2=a[2]-b[2];return d0*d0+d1*d1+d2*d2;}
 
-// ---- measure each emoji's true average color on THIS device ----------------
 function measureEmoji(ch,size=72){
   const c=document.createElement('canvas');c.width=c.height=size;
   const x=c.getContext('2d',{willReadFrequently:true});
@@ -196,27 +196,27 @@ function measureEmoji(ch,size=72){
   const d=x.getImageData(0,0,size,size).data;
   let r=0,g=0,b=0,a=0;
   for(let i=0;i<d.length;i+=4){const al=d[i+3]/255;r+=d[i]*al;g+=d[i+1]*al;b+=d[i+2]*al;a+=al;}
-  if(a<size*size*0.02) return null;            // glyph failed to render → use fallback
+  if(a<size*size*0.02) return null;
   r/=a;g/=a;b/=a;
   return {ch,r,g,b,lab:rgbToLab(r,g,b),cover:a/(size*size)};
 }
+
 function buildPalette(name){
   const raw=PALETTES[name].map(ch=>{
     const m=measureEmoji(ch);
     if(m) return m;
-    const f=FALLBACK[ch]||[128,128,128];          // never drop a swatch
+    const f=FALLBACK[ch]||[128,128,128];
     return {ch,r:f[0],g:f[1],b:f[2],lab:rgbToLab(f[0],f[1],f[2]),cover:1};
   });
-  if(name==='moon') return raw;                    // keep full phase sequence
-  const kept=[];                                   // merge near-identical colors
+  if(name==='moon') return raw;
+  const kept=[];
   for(const e of raw){
     if(!kept.some(k=>dist2(k.lab,e.lab)<14)) kept.push(e);
   }
   return kept;
 }
 
-// ---- state -----------------------------------------------------------------
-let img=null, paletteName='squares', palette=[], lastGrid=null, mode='color';
+let img=null, paletteName='squares', palette=[], lastGrid=null, mode='moon';
 const $=id=>document.getElementById(id);
 const out=$('out'), octx=out.getContext('2d');
 
@@ -238,39 +238,35 @@ function renderSwatches(){
 }
 
 function moonGlyph(b, grad){
-  // b: 0..1 brightness, grad: + = brighter toward the right (light from right → waxing)
   if(b < 0.08) return '🌑';
   if(b > 0.92) return '🌕';
-  const waxing = grad >= 0;                 // right-lit phases vs left-lit phases
-  if(b < 0.37) return waxing ? '🌒' : '🌘'; // crescent
-  if(b < 0.63) return waxing ? '🌓' : '🌗'; // half
-  return waxing ? '🌔' : '🌖';              // gibbous
+  const waxing = grad >= 0;
+  if(b < 0.37) return waxing ? '🌒' : '🌘';
+  if(b < 0.63) return waxing ? '🌓' : '🌗';
+  return waxing ? '🌔' : '🌖';
 }
 
 function run(){
   if(!img) return;
   if(!palette.length){ palette=buildPalette(paletteName); renderSwatches(); }
   const iw=img.naturalWidth||img.width, ih=img.naturalHeight||img.height;
-  if(!iw||!ih) return;                                   // image not decoded yet
+  if(!iw||!ih) return;
   const t0=performance.now();
   const cols=Math.max(1,+$('cols').value);
   const rows=Math.min(2160,Math.max(1,Math.round(cols*ih/iw)));
 
-  // downscale image to cols×rows → each pixel is one cell's area-average color
   const s=document.createElement('canvas');s.width=cols;s.height=rows;
   const sx=s.getContext('2d',{willReadFrequently:true});
   sx.imageSmoothingEnabled=true;sx.imageSmoothingQuality='high';
   sx.drawImage(img,0,0,cols,rows);
   const px=sx.getImageData(0,0,cols,rows).data;
 
-  // adaptive cell so the export canvas stays a sane size at high resolution
   const cell=Math.max(7, Math.min(24, Math.round(2600/cols)));
   out.width=cols*cell;out.height=rows*cell;
   octx.fillStyle=$('bg').value;octx.fillRect(0,0,out.width,out.height);
   octx.font=Math.floor(cell*0.96)+'px '+EMOJI_FONT;
   octx.textAlign='center';octx.textBaseline='middle';
 
-  // precompute per-cell luminance (needed for moon mode + its gradient)
   const lum=new Float32Array(cols*rows);
   for(let p=0,j=0;p<px.length;p+=4,j++)
     lum[j]=(0.2126*px[p]+0.7152*px[p+1]+0.0722*px[p+2])/255;
@@ -282,9 +278,10 @@ function run(){
       const i=(y*cols+x)*4; let ch;
       if(mode==='moon'){
         const xl=Math.max(0,x-1), xr=Math.min(cols-1,x+1);
-        const grad=lum[y*cols+xr]-lum[y*cols+xl];   // horizontal light direction
+        const grad=lum[y*cols+xr]-lum[y*cols+xl];
         ch=moonGlyph(lum[y*cols+x], grad);
-      }else{
+      } else {
+        // 还原：保持计算最纯粹，不再使用命中率无效的缓存
         ch=nearest(rgbToLab(px[i],px[i+1],px[i+2])).ch;
       }
       octx.fillText(ch, x*cell+cell/2, y*cell+cell/2+1);
@@ -299,7 +296,6 @@ function run(){
   $('mtime').textContent=Math.round(performance.now()-t0);
 }
 
-// ---- wiring ----------------------------------------------------------------
 function setImage(src){
   const i=new Image();
   i.onload=()=>{ img=i; importedText=null; (i.decode?i.decode().catch(()=>{}):Promise.resolve()).then(run); };
@@ -321,27 +317,76 @@ $('cols').addEventListener('input',e=>{$('colsv').textContent=e.target.value; ru
 $('bg').addEventListener('input',()=>{ if(img) runDebounced(25); else if(importedText) renderTextGrid(importedText); });
 document.querySelectorAll('#palette button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('#palette button').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on');paletteName=b.dataset.p;palette=buildPalette(paletteName);renderSwatches();run();
+  b.classList.add('on');paletteName=b.dataset.p;palette=buildPalette(paletteName);
+  renderSwatches();run();
 }));
+
+function toggleModeUI(){
+  const moon = mode === 'moon';
+  $('palwrap').style.opacity = moon ? 0.35 : 1;
+  $('palwrap').style.pointerEvents = moon ? 'none' : 'auto';
+  if(moon && $('bg').value.toLowerCase() !== '#000000'){ $('bg').value='#070707'; }
+}
+
 document.querySelectorAll('#mode button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('#mode button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on');mode=b.dataset.m;
-  const moon=mode==='moon';
-  $('palwrap').style.opacity=moon?0.35:1;
-  $('palwrap').style.pointerEvents=moon?'none':'auto';
-  if(moon && $('bg').value.toLowerCase()!=='#000000'){ $('bg').value='#070707'; }
+  toggleModeUI();
   run();
 }));
 
-$('dl').addEventListener('click',()=>{const a=document.createElement('a');a.download='emoji-mosaic.png';a.href=out.toDataURL('image/png');a.click();});
-$('cp').addEventListener('click',()=>{if(lastGrid)navigator.clipboard.writeText(lastGrid).then(()=>{const b=$('cp');const o=b.textContent;b.textContent='✓ copied';setTimeout(()=>b.textContent=o,1200);});});
+$('dl').addEventListener('click',()=>{
+  if(!img && !importedText) return;
+  const btn = $('dl');
+  const orig = btn.textContent;
+  btn.textContent = '处理中...';
+  out.toBlob(blob => {
+    const a=document.createElement('a');
+    a.download='emoji-mosaic.jpg';
+    a.href=URL.createObjectURL(blob);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); btn.textContent = orig; }, 1000);
+  }, 'image/jpeg', 0.85);
+});
 
-// ---- text import / export --------------------------------------------------
+$('dl_svg').addEventListener('click',()=>{
+  if(!lastGrid) return;
+  const iw = out.width, ih = out.height;
+  const lines = lastGrid.split('\n');
+  const rows = lines.length;
+  if(!rows) return;
+  const colsArr = lines.map(splitGraphemes);
+  const cols = Math.max(...colsArr.map(r=>r.length));
+  const cell = iw / cols;
+  
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${iw} ${ih}" width="${iw}" height="${ih}">`;
+  svg += `<rect width="100%" height="100%" fill="${$('bg').value}"/>`;
+  const fontSize = Math.floor(cell * 0.96);
+  svg += `<style>text { font-family: ${EMOJI_FONT}; font-size: ${fontSize}px; dominant-baseline: middle; text-anchor: middle; }</style>`;
+  
+  for(let y=0; y<rows; y++){
+    const chars = colsArr[y];
+    for(let x=0; x<chars.length; x++){
+      svg += `<text x="${x*cell+cell/2}" y="${y*cell+cell/2}">${chars[x]}</text>`;
+    }
+  }
+  svg += `</svg>`;
+  
+  const blob = new Blob([svg], {type: "image/svg+xml"});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'emoji-mosaic-vector.svg';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+});
+
+$('cp').addEventListener('click',()=>{if(lastGrid)navigator.clipboard.writeText(lastGrid).then(()=>{const b=$('cp');const o=b.textContent;b.textContent='✓ 已复制';setTimeout(()=>b.textContent=o,1200);});});
+
 function splitGraphemes(s){
   if(typeof Intl!=='undefined' && Intl.Segmenter){
     return Array.from(new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(s), x=>x.segment);
   }
-  return Array.from(s);                          // fallback (may split ZWJ sequences)
+  return Array.from(s);
 }
 function renderTextGrid(text){
   const lines=text.replace(/\r/g,'').replace(/\s+$/,'').split('\n');
@@ -376,7 +421,6 @@ $('txtfile').addEventListener('change',e=>{
   e.target.value='';
 });
 
-// ---- boot: build palette + draw a sample so it's not empty -----------------
 function makeSample(){
   const c=document.createElement('canvas');c.width=c.height=300;const g=c.getContext('2d');
   const grd=g.createLinearGradient(0,0,300,300);
@@ -387,9 +431,9 @@ function makeSample(){
   g.strokeStyle='#ffe9b0';g.lineWidth=8;g.beginPath();g.arc(150,170,34,0.15,Math.PI-0.15);g.stroke();
   return c.toDataURL();
 }
-// give webfont a beat, then measure (emoji font is system-native anyway)
 window.addEventListener('load',()=>{
   palette=buildPalette(paletteName);renderSwatches();
+  toggleModeUI();
   setImage(makeSample());
 });
 </script>

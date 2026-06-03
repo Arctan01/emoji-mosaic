@@ -15,7 +15,7 @@ No build step, no dependencies, no server. Open `emoji-mosaic.html` in a browser
 1. Open `emoji-mosaic.html` in any modern browser (Chrome, Safari, Firefox, Edge).
 2. Drag an image onto the drop zone, or click to choose a file.
 3. Adjust the controls. The output re-renders live.
-4. Export with **↓ PNG**, **↓ Text .txt**, or **⧉ Copy text**. Reload a saved grid with **↑ Import text**.
+4. Export with **↓ jpeg**, **↓ svg**, **↓ Text .txt**, or **⧉ Copy text**. Reload a saved grid with **↑ Import text**.
 
 A small sample image renders on load, so you can see the engine working before uploading anything.
 
@@ -40,7 +40,8 @@ If on-device measurement fails for any glyph (some browsers can't read color-emo
 | **Resolution** | Number of columns, 16–512. Rows are derived from the image aspect ratio. |
 | **Palette** | Emoji set used for color matching (see below). Disabled in Moon relief mode. |
 | **Backing color** | Fill behind the glyphs. Matters most with non-square emoji, whose transparent corners let it show through. |
-| **↓ PNG** | Download the rendered mosaic as a PNG. |
+| **↓ jpeg** | Download the rendered mosaic as a jpeg. |
+| **↓ svg** | Download the rendered mosaic as a svg. |
 | **↓ Text .txt** | Download the emoji grid as a UTF-8 `.txt` file. |
 | **⧉ Copy text** | Copy the emoji grid to the clipboard. |
 | **↑ Import text** | Load a saved `.txt` emoji grid and render it to the canvas. |
@@ -64,7 +65,7 @@ Encoding light direction this way gives edges a lit-from-the-side, sculpted feel
 
 ### Text import / export
 
-The emoji grid round-trips as plain text. Export with **↓ Text .txt** (or copy to clipboard), and later reload it with **↑ Import text** to view or re-export as PNG. Import uses `Intl.Segmenter` (grapheme granularity) so multi-codepoint emoji — ZWJ sequences and variation-selector glyphs like ❤️ — stay intact as single cells instead of being split apart. Importing clears the current image, so slider and color tweaks won't overwrite the imported view; changing the backing color re-renders the imported grid against it.
+The emoji grid round-trips as plain text. Export with **↓ Text .txt** (or copy to clipboard), and later reload it with **↑ Import text** to view or re-export . Import uses `Intl.Segmenter` (grapheme granularity) so multi-codepoint emoji — ZWJ sequences and variation-selector glyphs like ❤️ — stay intact as single cells instead of being split apart. Importing clears the current image, so slider and color tweaks won't overwrite the imported view; changing the backing color re-renders the imported grid against it.
 
 ### Performance
 
@@ -73,15 +74,14 @@ Rendering the slider is **debounced**: while you drag the resolution control the
 ### Notes & limitations
 
 - **Emoji gamut is narrow.** Even the Max palette can't reach deeply desaturated or muted tones — emoji cluster around saturated primaries, mid-grays, and a few browns. Photos with subtle palettes will flatten.
-- **High resolution = large exports.** Cell size shrinks adaptively as columns increase to keep PNG dimensions reasonable, but 512 columns on a tall image is still a multi-thousand-pixel file. Watch the build-time readout.
 - **Text alignment** in other apps depends on their emoji width handling.
 - Everything runs client-side. Images never leave your machine.
 
 ### Possible next steps
 
 - **Dithering** (e.g. Floyd–Steinberg) to make the limited palette mix optically and fake in-between colors — the single biggest quality gain available for color mode.
-- **Light-direction control** for relief mode, to rotate the "sun" to any angle (including vertical gradients) instead of just left/right.
-- **Per-emoji repeat penalty** so flat regions don't collapse to a single repeated glyph.
+- **Light-direction control** for relief mode, to rotate the "sun" to any angle (including vertical gradients) instead of just left/right.(√)
+
 
 ### File
 
@@ -100,7 +100,7 @@ Rendering the slider is **debounced**: while you drag the resolution control the
 1. 用任意现代浏览器（Chrome、Safari、Firefox、Edge）打开 `emoji-mosaic.html`。
 2. 把图片拖到拖放区，或点击选择文件。
 3. 调整控件，输出会实时重绘。
-4. 用 **↓ PNG**、**↓ Text .txt** 或 **⧉ Copy text** 导出；用 **↑ Import text** 重新载入已保存的网格。
+4. 用 **↓ jpeg**、**↓ svg**、 **↓ Text .txt** 或 **⧉ Copy text** 导出；用 **↑ Import text** 重新载入已保存的网格。
 
 页面加载时会先渲染一张示例图，方便在上传前就看到引擎的效果。
 
@@ -125,7 +125,8 @@ Rendering the slider is **debounced**: while you drag the resolution control the
 | **Resolution（分辨率）** | 列数，范围 16–512。行数由图片宽高比推算。 |
 | **Palette（调色板）** | 颜色匹配所用的 emoji 集合（见下）。月相浮雕模式下禁用。 |
 | **Backing color（背景色）** | 字形背后的填充色。对非方形 emoji 影响最大，因为透明边角会透出该色。 |
-| **↓ PNG** | 把渲染好的马赛克下载为 PNG。 |
+| **↓ jpeg** | 把渲染好的马赛克下载为 jpeg。 |
+| **↓ svg** | 把渲染好的马赛克下载为 svg。 |
 | **↓ Text .txt** | 把 emoji 网格下载为 UTF-8 编码的 `.txt` 文件。 |
 | **⧉ Copy text** | 把 emoji 网格复制到剪贴板。 |
 | **↑ Import text** | 载入已保存的 `.txt` emoji 网格并渲染到画布。 |
@@ -149,7 +150,7 @@ Rendering the slider is **debounced**: while you drag the resolution control the
 
 ### 文本导入 / 导出
 
-emoji 网格可作为纯文本往返保存。用 **↓ Text .txt**（或复制到剪贴板）导出，之后用 **↑ Import text** 重新载入以查看或重新导出为 PNG。导入使用 `Intl.Segmenter`（字素粒度），因此多码点 emoji——ZWJ 组合序列以及带变体选择符的字形（如 ❤️）——会作为单个格子保持完整，而不会被拆散。导入会清除当前图片，所以拖动滑块或调整颜色不会覆盖导入的视图；更改背景色会让导入的网格基于新背景重新渲染。
+emoji 网格可作为纯文本往返保存。用 **↓ Text .txt**（或复制到剪贴板）导出，之后用 **↑ Import text** 重新载入以查看或重新导出为 jpeg、svg。导入使用 `Intl.Segmenter`（字素粒度），因此多码点 emoji——ZWJ 组合序列以及带变体选择符的字形（如 ❤️）——会作为单个格子保持完整，而不会被拆散。导入会清除当前图片，所以拖动滑块或调整颜色不会覆盖导入的视图；更改背景色会让导入的网格基于新背景重新渲染。
 
 ### 性能
 
@@ -158,15 +159,13 @@ emoji 网格可作为纯文本往返保存。用 **↓ Text .txt**（或复制�
 ### 说明与局限
 
 - **emoji 色域偏窄。** 即便是 Max 调色板也无法触及高度去饱和或灰暗的色调——emoji 集中在饱和的原色、中性灰和少数棕色附近。色彩微妙的照片会被压平。
-- **高分辨率 = 大体积导出。** 列数增加时格子尺寸会自适应缩小以控制 PNG 尺寸，但竖图在 512 列下仍会生成数千像素的文件。请留意生成耗时读数。
 - **文本对齐** 在其它应用中取决于它们对 emoji 宽度的处理。
 - 全部在客户端运行，图片绝不离开你的设备。
 
 ### 后续可能的方向
 
 - **抖动算法**（如 Floyd–Steinberg），让有限的调色板在视觉上混合、伪造出中间色——这是颜色模式下能带来的最大画质提升。
-- **光照方向控制**，让浮雕模式的"太阳"可旋转到任意角度（包括垂直梯度），而不仅是左右。
-- **单 emoji 重复惩罚**，避免平坦区域坍缩成同一个反复出现的字形。
+- **光照方向控制**，让浮雕模式的"太阳"可旋转到任意角度（包括垂直梯度），而不仅是左右。(√)
 
 ### 文件
 
