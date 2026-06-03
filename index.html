@@ -95,7 +95,7 @@
 
     <label class="field">
       <span class="lbl">Resolution <b id="colsv">56</b> cols</span>
-      <input type="range" id="cols" min="16" max="512" value="56">
+      <input type="range" id="cols" min="16" max="1024" value="56">
     </label>
 
     <div class="field" id="palwrap">
@@ -254,7 +254,7 @@ function run(){
   if(!iw||!ih) return;                                   // image not decoded yet
   const t0=performance.now();
   const cols=Math.max(1,+$('cols').value);
-  const rows=Math.min(900,Math.max(1,Math.round(cols*ih/iw)));
+  const rows=Math.min(2160,Math.max(1,Math.round(cols*ih/iw)));
 
   // downscale image to cols×rows → each pixel is one cell's area-average color
   const s=document.createElement('canvas');s.width=cols;s.height=rows;
